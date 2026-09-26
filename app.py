@@ -1,228 +1,579 @@
 import streamlit as st
 import pandas as pd
+import numpy as np
 import joblib
+import matplotlib.pyplot as plt
+import seaborn as sns
 
-# =========================
+
+# =========================================================
 # PAGE CONFIGURATION
-# =========================
+# =========================================================
+
 st.set_page_config(
-    page_title="Medical Insurance Cost Predictor",
+    page_title="Medical Insurance Cost Prediction",
     page_icon="🏥",
-    layout="centered"
+    layout="wide"
 )
 
-# =========================
-# LOAD TRAINED MODEL
-# =========================
+
+# =========================================================
+# LOAD MODEL AND DATA
+# =========================================================
+
 model = joblib.load("insurance_model.pkl")
+df = pd.read_csv("insurance.csv")
 
-# =========================
-# CUSTOM CSS
-# =========================
-st.markdown("""
-<style>
 
-.main {
-    background-color: #f4f7fb;
-}
+# =========================================================
+# SIDEBAR
+# =========================================================
 
-.block-container {
-    max-width: 900px;
-    padding-top: 2rem;
-}
+st.sidebar.title("🏥 Insurance Predictor")
+st.sidebar.write("Medical Insurance Cost Prediction")
 
-.header {
-    background-color: #173F5F;
-    padding: 30px;
-    border-radius: 15px;
-    text-align: center;
-    color: white;
-    margin-bottom: 25px;
-}
+st.sidebar.markdown("---")
 
-.header h1 {
-    margin: 0;
-    font-size: 32px;
-}
-
-.header p {
-    margin-top: 8px;
-    font-size: 16px;
-}
-
-.section {
-    background-color: white;
-    padding: 25px;
-    border-radius: 15px;
-    border: 1px solid #dddddd;
-    margin-bottom: 20px;
-}
-
-.result {
-    background-color: white;
-    padding: 25px;
-    border-radius: 15px;
-    border: 2px solid #1B8A5A;
-    text-align: center;
-    margin-top: 20px;
-}
-
-.result-title {
-    font-size: 18px;
-    color: #666666;
-}
-
-.result-value {
-    font-size: 38px;
-    font-weight: bold;
-    color: #1B8A5A;
-}
-
-.footer {
-    text-align: center;
-    color: #888888;
-    font-size: 13px;
-    margin-top: 25px;
-}
-
-</style>
-""", unsafe_allow_html=True)
-
-# =========================
-# HEADER
-# =========================
-st.markdown("""
-<div class="header">
-    <h1>🏥 Medical Insurance Cost Predictor</h1>
-    <p>Machine Learning Based Insurance Cost Prediction System</p>
-</div>
-""", unsafe_allow_html=True)
-
-# =========================
-# DESCRIPTION
-# =========================
-st.write(
-    "Enter the patient's information below to estimate the medical insurance cost."
+page = st.sidebar.radio(
+    "Navigation",
+    [
+        "Home",
+        "Data Analysis",
+        "Predict Insurance Cost"
+    ]
 )
 
-# =========================
-# PATIENT INFORMATION
-# =========================
-st.markdown("""
-<div class="section">
-<h3>👤 Patient Information</h3>
-</div>
-""", unsafe_allow_html=True)
+st.sidebar.markdown("---")
 
-col1, col2 = st.columns(2)
+st.sidebar.write("**Domain:** Data Science")
+st.sidebar.write("**Model:** Regression")
+st.sidebar.write("**Platform:** Streamlit")
 
-with col1:
-    age = st.number_input(
-        "Age",
-        min_value=1,
-        max_value=100,
-        value=25,
-        step=1
+
+# =========================================================
+# HOME PAGE
+# =========================================================
+
+if page == "Home":
+
+    st.title("Medical Insurance Cost Prediction")
+
+    st.write(
+        "A machine learning based application for estimating "
+        "approximate medical insurance charges using customer information."
     )
 
-    bmi = st.number_input(
-        "BMI",
-        min_value=1.0,
-        max_value=100.0,
-        value=25.0,
-        step=0.1
+    st.markdown("---")
+
+    st.subheader("Project Overview")
+
+    st.write(
+        "This project uses customer information such as age, gender, BMI, "
+        "number of children, smoking status and region to predict an "
+        "approximate medical insurance cost."
     )
 
-    smoker = st.selectbox(
-        "Smoker",
-        ["No", "Yes"]
+    st.write(
+        "The project covers data analysis, preprocessing, regression model "
+        "training and deployment through a Streamlit application."
     )
 
-with col2:
-    gender = st.selectbox(
-        "Gender",
-        ["Male", "Female"]
+    st.markdown("---")
+
+    st.subheader("Project Features")
+
+    col1, col2, col3 = st.columns(3)
+
+    with col1:
+        st.info(
+            "**📊 Data Analysis**\n\n"
+            "Study the insurance dataset using different "
+            "graphs and visualizations."
+        )
+
+    with col2:
+        st.info(
+            "**🤖 Machine Learning**\n\n"
+            "Use a regression model to estimate insurance charges."
+        )
+
+    with col3:
+        st.info(
+            "**💻 Prediction**\n\n"
+            "Enter customer details and get an estimated insurance cost."
+        )
+
+    st.markdown("---")
+
+    st.subheader("Features Used")
+
+    col1, col2 = st.columns(2)
+
+    with col1:
+        st.write(
+            """
+            • Age  
+            • Gender  
+            • BMI  
+            • Number of Children
+            """
+        )
+
+    with col2:
+        st.write(
+            """
+            • Smoking Status  
+            • Region  
+            • Insurance Charges
+            """
+        )
+
+    st.markdown("---")
+
+    st.subheader("Technologies Used")
+
+    st.write(
+        "Python • Pandas • Scikit-learn • Joblib • Streamlit • JupyterLab"
     )
 
-    children = st.number_input(
-        "Children",
-        min_value=0,
-        max_value=20,
-        value=1,
-        step=1
+    st.info(
+        "The prediction is an approximate estimate generated by the "
+        "trained machine learning model. It is not an official "
+        "insurance quotation."
     )
 
-    region = st.selectbox(
-        "Region",
-        [
-            "Northeast",
-            "Northwest",
-            "Southeast",
-            "Southwest"
-        ]
+
+# =========================================================
+# DATA ANALYSIS PAGE
+# =========================================================
+
+elif page == "Data Analysis":
+
+    st.title("Data Analysis")
+
+    st.write(
+        "The graphs below are based on the insurance dataset used "
+        "for the project."
     )
 
-# =========================
-# PREDICTION BUTTON
-# =========================
-st.write("")
+    st.markdown("---")
 
-predict_button = st.button(
-    "🔮 Predict Insurance Cost",
-    use_container_width=True
-)
 
-# =========================
-# PREDICTION
-# =========================
-if predict_button:
+    # =====================================================
+    # 1. DISTRIBUTION OF INSURANCE CHARGES
+    # =====================================================
 
-    # Convert categorical values
-    sex = 1 if gender == "Male" else 0
+    st.subheader("1. Distribution of Insurance Charges")
 
-    smoker_value = 1 if smoker == "Yes" else 0
+    fig1, ax1 = plt.subplots(figsize=(10, 5))
 
-    region_dict = {
-        "Northeast": 0,
-        "Northwest": 1,
-        "Southeast": 2,
-        "Southwest": 3
-    }
+    sns.histplot(
+        data=df,
+        x="charges",
+        kde=True,
+        ax=ax1
+    )
 
-    region_value = region_dict[region]
+    ax1.set_xlabel("Insurance Charges")
+    ax1.set_ylabel("Frequency")
+    ax1.set_title("Distribution of Insurance Charges")
 
-    # Create DataFrame
-    data = pd.DataFrame({
-        "age": [age],
-        "sex": [sex],
-        "bmi": [bmi],
-        "children": [children],
-        "smoker": [smoker_value],
-        "region": [region_value]
+    st.pyplot(fig1)
+
+    plt.close(fig1)
+
+    st.caption(
+        "This graph shows the distribution of medical insurance charges "
+        "in the dataset."
+    )
+
+
+    st.markdown("---")
+
+
+    # =====================================================
+    # 2. REGION DISTRIBUTION
+    # =====================================================
+
+    st.subheader("2. Region Distribution")
+
+    region_count = df["region"].value_counts()
+
+    fig2, ax2 = plt.subplots(figsize=(9, 5))
+
+    region_count.plot(
+        kind="bar",
+        ax=ax2
+    )
+
+    ax2.set_xlabel("Region")
+    ax2.set_ylabel("Number of Customers")
+    ax2.set_title("Region Distribution")
+
+    plt.xticks(rotation=0)
+
+    st.pyplot(fig2)
+
+    plt.close(fig2)
+
+    st.caption(
+        "This graph shows the number of records belonging to each region."
+    )
+
+
+    st.markdown("---")
+
+
+    # =====================================================
+    # 3. SMOKER VS INSURANCE CHARGES
+    # =====================================================
+
+    st.subheader("3. Smoker vs Insurance Charges")
+
+    fig3, ax3 = plt.subplots(figsize=(9, 5))
+
+    sns.boxplot(
+        data=df,
+        x="smoker",
+        y="charges",
+        ax=ax3
+    )
+
+    ax3.set_xlabel("Smoker")
+    ax3.set_ylabel("Insurance Charges")
+    ax3.set_title("Smoker vs Insurance Charges")
+
+    st.pyplot(fig3)
+
+    plt.close(fig3)
+
+    st.caption(
+        "This boxplot compares insurance charges for smokers and non-smokers."
+    )
+
+
+    st.markdown("---")
+
+
+    # =====================================================
+    # 4. CORRELATION HEATMAP
+    # =====================================================
+
+    st.subheader("4. Correlation Heatmap")
+
+    # Make a copy so original dataframe is not changed
+    corr_df = df.copy()
+
+    # Convert categorical columns into numerical values
+    corr_df["sex"] = corr_df["sex"].map({
+        "male": 1,
+        "female": 0
     })
 
-    # Make prediction
-    prediction = model.predict(data)
+    corr_df["smoker"] = corr_df["smoker"].map({
+        "yes": 1,
+        "no": 0
+    })
 
-    cost = prediction[0]
+    corr_df["region"] = corr_df["region"].map({
+        "northeast": 0,
+        "northwest": 1,
+        "southeast": 2,
+        "southwest": 3
+    })
 
-    # Display result
-    st.markdown(f"""
-    <div class="result">
-        <div class="result-title">
-            Estimated Insurance Cost
-        </div>
-        <div class="result-value">
-            ₹ {cost:,.2f}
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
+    correlation = corr_df[
+        [
+            "age",
+            "sex",
+            "bmi",
+            "children",
+            "smoker",
+            "region",
+            "charges"
+        ]
+    ].corr()
 
-# =========================
+    fig4, ax4 = plt.subplots(figsize=(9, 6))
+
+    sns.heatmap(
+        correlation,
+        annot=True,
+        fmt=".2f",
+        cmap="coolwarm",
+        linewidths=0.5,
+        ax=ax4
+    )
+
+    ax4.set_title("Correlation Heatmap")
+
+    st.pyplot(fig4)
+
+    plt.close(fig4)
+
+    st.caption(
+        "The heatmap shows the correlation between the numerical "
+        "features and insurance charges."
+    )
+
+
+    st.markdown("---")
+
+
+    # =====================================================
+    # 5. ACTUAL VS PREDICTED INSURANCE CHARGES
+    # =====================================================
+
+    st.subheader("5. Actual vs Predicted Insurance Charges")
+
+    # Prepare the same feature columns used by the model
+
+    model_df = df.copy()
+
+    model_df["sex"] = model_df["sex"].map({
+        "male": 1,
+        "female": 0
+    })
+
+    model_df["smoker"] = model_df["smoker"].map({
+        "yes": 1,
+        "no": 0
+    })
+
+    model_df["region"] = model_df["region"].map({
+        "northeast": 0,
+        "northwest": 1,
+        "southeast": 2,
+        "southwest": 3
+    })
+
+    X = model_df[
+        [
+            "age",
+            "sex",
+            "bmi",
+            "children",
+            "smoker",
+            "region"
+        ]
+    ]
+
+    y = model_df["charges"]
+
+    # Use saved model for prediction
+    predicted = model.predict(X)
+
+    fig5, ax5 = plt.subplots(figsize=(9, 6))
+
+    ax5.scatter(
+        y,
+        predicted,
+        alpha=0.6
+    )
+
+    # Reference line
+    minimum = min(y.min(), predicted.min())
+    maximum = max(y.max(), predicted.max())
+
+    ax5.plot(
+        [minimum, maximum],
+        [minimum, maximum],
+        linestyle="--"
+    )
+
+    ax5.set_xlabel("Actual Insurance Charges")
+    ax5.set_ylabel("Predicted Insurance Charges")
+    ax5.set_title("Actual vs Predicted Insurance Charges")
+
+    st.pyplot(fig5)
+
+    plt.close(fig5)
+
+    st.caption(
+        "The graph compares actual insurance charges with values "
+        "predicted by the trained regression model."
+    )
+
+
+    st.markdown("---")
+
+    st.subheader("Dataset Preview")
+
+    st.dataframe(
+        df.head(10),
+        use_container_width=True
+    )
+
+
+# =========================================================
+# PREDICTION PAGE
+# =========================================================
+
+else:
+
+    st.title("Insurance Cost Prediction")
+
+    st.write(
+        "Enter customer details below to generate an estimated "
+        "medical insurance cost."
+    )
+
+    st.markdown("---")
+
+    st.subheader("Customer Information")
+
+    # -----------------------------------------------------
+    # INPUTS
+    # -----------------------------------------------------
+
+    col1, col2 = st.columns(2)
+
+    with col1:
+
+        age = st.number_input(
+            "Age",
+            min_value=1,
+            max_value=100,
+            value=25,
+            step=1
+        )
+
+        gender = st.selectbox(
+            "Gender",
+            [
+                "Male",
+                "Female"
+            ]
+        )
+
+        bmi = st.number_input(
+            "BMI",
+            min_value=10.0,
+            max_value=60.0,
+            value=25.98,
+            step=0.01
+        )
+
+    with col2:
+
+        children = st.number_input(
+            "Number of Children",
+            min_value=0,
+            max_value=10,
+            value=1,
+            step=1
+        )
+
+        smoker = st.selectbox(
+            "Smoker",
+            [
+                "No",
+                "Yes"
+            ]
+        )
+
+        region = st.selectbox(
+            "Region",
+            [
+                "Northeast",
+                "Northwest",
+                "Southeast",
+                "Southwest"
+            ]
+        )
+
+    st.markdown("---")
+
+    # -----------------------------------------------------
+    # PREDICTION BUTTON
+    # -----------------------------------------------------
+
+    predict = st.button(
+        "🔍 Predict Insurance Cost",
+        use_container_width=True
+    )
+
+    if predict:
+
+        # Gender conversion
+        if gender == "Male":
+            sex = 1
+        else:
+            sex = 0
+
+        # Smoker conversion
+        if smoker == "Yes":
+            smoker_value = 1
+        else:
+            smoker_value = 0
+
+        # Region conversion
+        region_mapping = {
+            "Northeast": 0,
+            "Northwest": 1,
+            "Southeast": 2,
+            "Southwest": 3
+        }
+
+        region_value = region_mapping[region]
+
+        # Create input dataframe
+        input_data = pd.DataFrame({
+            "age": [age],
+            "sex": [sex],
+            "bmi": [bmi],
+            "children": [children],
+            "smoker": [smoker_value],
+            "region": [region_value]
+        })
+
+        # Prediction
+        prediction = model.predict(input_data)[0]
+
+        st.markdown("---")
+
+        st.subheader("Prediction Result")
+
+        st.success(
+            f"Estimated Medical Insurance Cost: ₹ {prediction:,.2f}"
+        )
+
+        st.caption(
+            "This is an approximate prediction generated by "
+            "the trained machine learning model."
+        )
+
+        # Show entered details
+        with st.expander("View Entered Details"):
+
+            details = pd.DataFrame({
+                "Parameter": [
+                    "Age",
+                    "Gender",
+                    "BMI",
+                    "Children",
+                    "Smoker",
+                    "Region"
+                ],
+                "Value": [
+                    age,
+                    gender,
+                    bmi,
+                    children,
+                    smoker,
+                    region
+                ]
+            })
+
+            st.table(details)
+
+
+# =========================================================
 # FOOTER
-# =========================
-st.markdown("""
-<div class="footer">
-    Medical Insurance Cost Prediction using Machine Learning
-</div>
-""", unsafe_allow_html=True)
+# =========================================================
+
+st.markdown("---")
+
+st.caption(
+    "Medical Insurance Cost Prediction • B.Sc. Data Science Project"
+)
